@@ -1,0 +1,662 @@
+<!doctype html>
+<!--[if lt IE 7 ]> <html class="no-js ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]>    <html class="no-js ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]>    <html class="no-js ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>SmartEnergy Webapp</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+
+  <link href="css/ui-dark/jquery-ui-1.8.13.custom.css" rel="stylesheet" type="text/css"/>
+  <link rel="stylesheet" href="css/style.css?v=2"> 
+  <script src="js/libs/modernizr-1.7.min.js"></script>	
+  <script src="js/libs/jquery.min.js"></script>  
+  <script type="text/javascript" src="js/libs/jquery-ui.min.js"></script>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/libs/jquery.jwNotify.js"></script>
+  <script src="js/libs/jquery.favicon.js"></script>
+  <script src="js/libs/underscore-min.js"></script>
+  <script src="js/libs/backbone-min.js"></script>  
+  <script src="js/libs/ICanHaz.min.js"></script>  
+  <script src="js/libs/json2.js"></script>
+  
+  
+  <script src="js/libs/jQueryRotate.js"></script>
+  <script type="text/javascript" src="js/libs/jquery.mousewheel.min.js"></script>
+  <script type="text/javascript" src="js/libs/jquery.touchwipe.min.js"></script>
+  
+  
+  <script src="js/model.js"></script>
+
+  <!--<script src="js/view.js"></script>-->
+
+  <script src="js/views/sceneview.js"></script>
+  <script src="js/views/kinectview.js"></script>
+  <script src="js/views/regionview.js"></script>
+  <script src="js/views/actionview.js"></script>
+  <script src="js/views/userview.js"></script>
+  <script src="js/views/commandview.js"></script>
+  <script src="js/views/deviceview.js"></script>
+  <script src="js/views/gestureDialogView.js"></script>
+
+  <script src="js/views/pushUi/chillUiView.js"></script>
+  <script src="js/views/pushUi/kitchenUiView.js"></script>
+  <script src="js/views/pushUi/livingUiView.js"></script>
+  <script src="js/views/pushUi/lightsUiView.js"></script>
+  <script src="js/views/pushUi/tvUiView.js"></script>
+  <script src="js/views/pushUi/deviceUIView.js"></script>
+
+  
+
+  <script src="js/mobiletweaks.js"></script>
+  <script src="js/controller.js"></script>
+  <script src="js/script.js"></script>
+</head>
+
+<body id="b">
+<script id="scenecreatortmpl" type="text/html">
+	<div class="sceneSelect" id="sceneSelectStep1">
+		  <h1>select or create scene</h1>
+		  <div class="button">
+		    <input type="button" id="newSceneBtn" class="btn" value="create new scene" />
+		  </div>
+		  <div class="button">
+		    <input type="button" id="loadSceneBtn" class="btn" value="load scene" />
+		  </div>
+	</div>	
+	<div class="sceneSelect" id="sceneSelectStep2">
+	  <h1>create new scene</h1>	
+	  <div class="form">	
+	    <div class="formrow">	
+	      <div class="formlabel">scenename</div>  
+	      <div class="formvalue"><input type="text" id="sceneName"  class="text" value="testscene" /></div> 	
+	    </div>
+	    <div class="clear"></div>	   
+	    <div class="formrow">	
+	      <div class="formlabel">background image</div>  
+	      <div class="formvalue"><input type="text" id="sceneBgImg" value="img/baall_karte.png"   class="text"/></div> 	
+        <!--<div class="formvalue"><input type="text" id="sceneBgImg" value="img/projekttag_map.png"   class="text"/></div>--> 
+	    </div>
+	    <div class="clear"></div>	
+	    <div class="formrow">	
+	      <div class="formlabel">scenewidth (mm)</div>  
+	      <div class="formvalue"><input type="text" id="sceneWidth" value="10605"   class="text"/></div>
+        <!--<div class="formvalue"><input type="text" id="sceneWidth" value="5400"   class="text"/></div> -->	
+	    </div>
+	    <div class="clear"></div>	
+	    <div class="formrow">	
+	      <div class="formlabel">sceneheight (mm)</div>  
+	      <div class="formvalue"><input type="text"  id="sceneHeight" value="5850"  class="text"/></div>	
+        <!--<div class="formvalue"><input type="text"  id="sceneHeight" value="3150"  class="text"/></div> --> 
+	    </div>
+	    <div class="clear"></div>	
+	    <div class="formrow">	
+	      <div class="formlabel"> </div>  
+	      <div class="formvalue"> </div> 	
+	    </div>
+	    <div class="clear"></div>	
+	    <div class="formrow">	
+	      <div class="formlabel"></div>  
+	      <div class="formvalue"><input type="button" class="btn2" id="createSceneBtn" value="create scene" /></div> 	
+	    </div>	
+	  </div>			
+	</div>	
+
+				
+</script>	
+		
+<script id="sceneconfig" type="text/html">		
+	<ul class="ulsc">
+		<li class="lisc"><strong>Scenename</strong>: <input type="text" class="navinputtext long navconfiginput" value="{{ sceneName }}" id="navsceneName" /></li>
+		<li class="lisc"><strong>Bg-image</strong>: <input type="text" class="navinputtext long navconfiginput" id="navsceneBg"  value="" /></li>
+		<li class="lisc"><strong>Roomlength</strong>: <input type="text" class="navinputtext navconfiginput" id="navroomWidthMM"  value="{{ roomWidthMM }}" /> <i>mm</i></li>
+		<li class="lisc"><strong>Roomdepth</strong>: <input type="text" class="navinputtext navconfiginput" id="navroomHeightMM"  value="{{ roomHeightMM }}" /> <i>mm</i></li>
+    <li  class="lisc"><a href=""></a><strong>Show devices</strong>: <input type="checkbox" class="navconfiginput" id="showDeviceCheckbox" checked="checked" /></li>
+		<li  class="lisc"><a href=""></a><strong>Show pushed ui</strong>: <input type="checkbox" class="navconfiginput" id="pushUICheckbox" /></li>
+    <li  class="lisc"><strong>[DEBUG]</strong> <select class="navconfiginput" id="debug_overlay_select"><option>Chillen</option><option>Living</option><option>Lights</option><option>TV</option><option>Kitchen</option></select> <a href="javascript:showOverlay(this);">showOverlay</a></li>
+    
+	</ul>			
+</script>			
+		
+<script id="scenetmpl" type="text/html">		
+  
+	<div id="navigation" class="navigation_closed">
+	  <div id="navigationOptions"><img src="img/nav_hide_icon.png" id="nav_hide_icon" alt="hide navigation" /></div>
+	  <!--<div class="navleft"><a href="#navLeft" class="navLeftLnk"><img src="img/left.png" /></a></div>
+	  <div class="navright"><a href="#navRight"  class="navRightLnk"><img src="img/right.png" /></a></div>-->
+	  <h2 id="navigationHead">Navigation</h2>
+	
+	  <div id="navigationContent">
+	    <div id="accordion">
+		    <h3><a href="#">Scene</a></h3>
+		    <div>
+			    <div class="accordiontext" id="scenenav">
+
+			    </div>
+			    <div class="accordiontext">
+			      <div class="navigation_submenu">
+			         <div class="clearer"></div>
+			      </div>
+			    </div>
+		    </div>
+		    <h3><a href="#">Kinects</a> </h3>
+		    <div>
+	
+				<div class="listCtrl" id="kinectListCtrl"></div>
+				
+			    <div class="accordiontext">
+			      <div class="navigation_submenu">
+    			    <a href="#addKinect" class="addKinectLnk grey" title="deprecated">add</a> 
+    			    <span class="hideKinects"><a href="#hideKinects" class="hideKinectLnk">hide kinects</a></span>
+    			    <span class="showKinects"><a href="#showKinects" class="showKinectLnk">show kinects</a></span>
+              <div class="clearer"></div>
+           </div>
+			    </div>					    
+		    </div>
+		    <h3><a href="#">Regions</a></h3>
+		    <div>
+				  <div class="listCtrl" id="regionsListCtrl"></div>
+				
+		      <div class="accordiontext">
+		        <div class="navigation_submenu">		         
+  		        <a href="#addRegion" class="addRegionLnk">add rectangle</a> 
+  		        <a href="#addRegionPoly" class="addRegionPolyLnk">add polygon</a>
+  		        <div class="clearer"></div>
+  		      </div>  		     
+		      </div>	
+		    </div>
+		    <h3><a href="#">Commands</a></h3>
+		    <div>
+		    
+		    	<div class="listCtrl" id="commandListCtrl"></div>
+			    <div class="accordiontext">
+			      <div class="navigation_submenu"> 
+              <a href="#addCommand" class="addCommandLnk">Add command</a> 
+              <div class="clearer"></div>
+            </div>
+			    </div>			    	
+	
+		    </div>
+        <h3><a href="#">Users</a></h3>
+		    <div>
+		    
+		    	<div class="listCtrl" id="usersListCtrl"></div>
+			    <div class="accordiontext">
+			    </div>			    	
+	
+		    </div>
+	    </div>
+	
+	  </div>
+	
+	</div>
+	
+    <div id="karte"></div>
+</script>	
+
+<script id="scenebgtmpl" type="text/html">	
+	<img width="{{ bgWidthPx }}" src="{{ bgImage }}" id="bgkarte" />
+</script>	
+
+<script id="kinectdevtmpl" type="text/html">			
+	<div class="kinect" id="{{ htmlId }}">
+		<div class="kinectDevice">
+			<img class="kinImgSrc kinImgSrc1" id="kinimg1_{{ htmlId }}" src="img/kin01.png" />
+		</div>
+		<div class="kinectSpectrum">
+			<img class="kinImgSrc kinImgSrc2" id="kinimg2_{{ htmlId }}"   src="img/kin02.png" />
+		</div>
+	</div>	
+</script>	
+		
+<script id="kinectnavtmpl" type="text/html">	
+	<div class="lcEntry">
+		<div class="lcEntryIcon"><img src="img/kinecticon.png" /></div>
+		<div class="lcEntryContent">
+			<ul>
+        <li class="kinectinfolist"><strong>id</strong>: {{ name }}</li>
+				<li class="kinectinfolist"><strong>pos</strong>: x: <span class="offx">{{ offsetImgX }}</span><i>mm</i>, y: <span class="offy">{{ offsetImgY }}</span><i>mm</i></li>
+				<li class="kinectinfolist">
+					<div class="fl">
+						<strong>rot</strong>: <input type="text" value="{{ angle }}" class="ang" /></span>
+					</div> 
+					<div class="slider" id="slider_{{ htmlId }}"></div>				
+			  </li>
+				<li class="kinectinfolist clear"><!--<a href="#" class="kinectRemoveLnk">remove</a>--> </li>
+			</ul>
+		</div>
+		<div class="clear"></div> 
+	</div>
+</script>			
+			
+<script id="regiondevtmpl" type="text/html">			
+	<div class="box" id="{{ htmlId }}" style="width: {{ width }}; height: {{ height }};"></div>
+</script>	
+
+<script id="regionnavtmpl" type="text/html">	
+	<div class="lcEntry" id="boxEntry">
+        <div class="lcEntryIcon">
+          <div class="lcRegionColor"></div><div class="clear"></div>
+        </div>
+		<div class="lcEntryContent">
+			<ul class="lcInfos">
+        <li><strong>name</strong>: <input  class="lcInput"  type="text" value="{{ displayName }}" /></li>
+				<li><strong>pos</strong>: x: <span>{{ posX }}</span><i>mm</i>, y: <span>{{ posY }}</span><i>mm</i></li>
+				<li><strong>size</strong>: w: <span>{{ width }}</span><i>mm</i>, h: <span>{{ height }}</span><i>mm</i></li>
+				<li><a href="#removeBox" class="boxRemoveLnk">remove</a> </li>
+			</ul>
+		<div class="regionActions"></div>	
+		</div>
+		<div class="clear"></div>
+	</div>				
+</script>
+
+<script id="regionpolynavtmpl" type="text/html">    
+    <div class="lcEntry" id="boxEntry">
+        <div class="lcEntryIcon">
+          <canvas class="polyiconcanvas" width="50" height="50"></canvas>
+        </div>
+        <div class="lcEntryContent">
+            <ul class="lcInfos">
+                <li><strong>name</strong>: <input  class="lcInput"  type="text" value="{{ displayName }}" /></li>
+                <li><strong>vert</strong>: <span class="vert"></span></li>
+                <li><a href="#removeBox" class="boxPolyRemoveLnk">remove</a></li>
+            </ul>
+        <div class="regionActions"></div>
+        </div>
+        <div class="clear"></div>
+    </div>              
+</script>   	
+		
+<script id="actiontmpl" type="text/html">	
+	<div class="regionAction" id="{{ htmlId }}">
+		<select class="regionActionEvent">
+			<option></option>
+			<option value="userIn">on enter</option>
+			<option value="newPosOfUser">in region</option>
+			<option value="userOut">on leave</option>
+		</select> 
+		<select class="regionActionAction">
+			<option></option>
+		</select> 
+		<a href="#removeAction"><img src="img/trash.png" class="trashicon" /></a>
+	</div>			
+</script>	
+
+<script id="actionoptionstmpl" type="text/html">   
+    <option value="{{ name }}">{{ name }}</option>
+</script>   
+
+<script id="userdevtmpl" type="text/html">			
+	<div class="user" id="{{ htmlId }}"></div>
+</script>	
+
+<script id="userbubbletmpl" type="text/html">      
+    <div id="bubble_{{ htmlId }}" class="spechbubble"></div>    
+</script>   
+
+
+<script id="usernavtmpl" type="text/html">	
+	<div class="lcEntry" id="nav{{ htmlId }}">
+		<div class="lcEntryIcon">
+		  <div class="lcUserColor"></div><div class="clear"></div>
+		</div>
+		<div class="lcEntryContent">
+			<ul>
+				<li class="userpos"><strong>id</strong>: {{ userid }} - <strong>pos</strong>: x: <span>{{ posX }}</span><i>mm</i>, y: <span>{{ posY }}</span><i>mm</i></li>
+			</ul>
+		</div>
+		<div class="clear"></div> 
+	</div>
+</script>	
+
+<script id="commandnavtmpl" type="text/html">	
+	<div class="lcEntry">
+		<div class="lcEntryIcon">
+	
+		</div>
+		<div class="lcEntryContent">
+			<ul>
+				<li class=""><strong>name</strong>: {{ name }}</li>
+        <li class=""><strong>conditions</strong>: <span class="comNavCond"></span></li>
+        <li class=""><strong>actions</strong>: <span class="actNavCond"></span></li>
+        <li class=""><a href="#editCommand" class="editCommandLnk">edit<a> <a href="#delCommand" class="delCommandLnk">delete<a></li>
+			</ul>
+		</div>
+		<div class="clear"></div> 
+	</div>
+</script>	
+
+<script id="canvastmpl" type="text/html">  
+    <canvas id="canvas" width="{{ w }}" height="{{h}}"></canvas>
+</script>   
+<script id="polygonvectinputstmpl" type="text/html">  
+    <span>(<input class="inputpolynavpoint inputpolynavpointX" type="text" value="{{ xMM }}" />, <input class="inputpolynavpoint inputpolynavpointY"  type="text" value="{{ yMM }}" />)</span>
+</script>   
+
+<script id="conditionTmpl" type="text/html">	
+
+    <div class="actionEntry actionCondi{{ name }}">
+      <div class="actionEntryContent">
+        <div class="actionEntryIcon">
+          <img src="{{ icon }}" />
+        </div>
+        <div class="actionEntryConfig">
+          <div class="actionEntryConfigTxt">
+            <h2>{{ subCategory }} - {{ displayName }}</h2>
+          </div>
+        </div> 
+        <div class="clearer"></div>
+      </div>
+    </div>		
+ 
+</script>	
+
+<script id="conditionConfigRowTmpl" type="text/html">		
+  <div class="actionEntryForm">
+    <div class="actionEntryFormRow">
+      <div class="actionEntryFormLabel">{{ name }}:</div>
+      <div class="actionEntryFormValue">
+
+      </div> 
+      <div class="clearer"></div>
+    </div>                        
+  </div>	
+</script>	
+
+
+
+
+
+<script id="commandDialogTmpl" type="text/html">		
+
+
+
+  <div class="action_dialog" title="Add Command">
+
+    <div class="commandName">Command name: <input class="commandNameInput" type="text" value="{{ name }}" /></div>
+
+    <h1>Selected conditions</h1>
+    <div class="selected_conditions">  
+    </div>
+
+
+    <h1>Available conditions</h1>
+
+    <div id="avtabs">
+	    <ul>
+		    <li><a href="#avctabs-1">Regions</a></li>
+		    <li><a href="#avctabs-2">Gestures</a></li>
+		    <li><a href="#avctabs-3">Other</a></li>
+	    </ul>
+	    <div class="tabcontent" id="avctabs-1">
+        <div class="sliderCtrl">
+          <div class="sliderCtrlContentContainer">
+             
+         
+            <div class="clearer"></div>
+          </div>
+        </div>
+        <div class="sliderCtrlSliderContainer">
+            <div class="horizontalSlider"></div>
+        </div>
+        
+	    </div>
+	    <div id="avctabs-2"  class="tabcontent">
+        <div class="sliderCtrl">
+          <div class="sliderCtrlContentContainer">
+             
+         
+            <div class="clearer"></div>
+          </div>
+        </div>
+        <div class="sliderCtrlSliderContainer">
+            <div class="horizontalSlider"></div>
+        </div>	
+	    </div>
+	    <div id="avctabs-3"  class="tabcontent">
+        <div class="sliderCtrl">
+          <div class="sliderCtrlContentContainer">
+             
+         
+            <div class="clearer"></div>
+          </div>
+        </div>
+        <div class="sliderCtrlSliderContainer">
+            <div class="horizontalSlider"></div>
+        </div>
+	    </div>
+    </div>
+
+
+
+
+    <h1>Selected actions</h1>
+    <div class="selected_actions">    
+    </div>
+
+    <h1>Available actions</h1>
+
+    <div id="tabs">
+	    <ul>
+		    <li><a href="#tabs-1">DigitalSTROM</a></li>
+		    <li><a href="#tabs-2">Baall</a></li>
+		    <li><a href="#tabs-3">Other</a></li>
+	    </ul>
+	    <div class="actions_tabcontent" id="tabs-1">
+       <div class="sliderCtrl">
+        <div class="sliderCtrlContentContainer">
+          <div class="clearer"></div>
+        </div>
+       </div>
+       <div class="sliderCtrlSliderContainer">
+        <div class="horizontalSlider"></div>
+       </div>	
+	    </div>
+	    <div class="actions_tabcontent" id="tabs-2">
+       <div class="sliderCtrl">
+        <div class="sliderCtrlContentContainer">
+          <div class="actionEntrySeperator actionSubCategoryLiving">
+            <div>Living</div>
+          </div>
+          <div class="actionEntrySeperator actionSubCategoryCorridor">
+            <div>Corridor</div>
+          </div>
+          <div class="actionEntrySeperator actionSubCategoryBath">
+            <div>Bath</div>
+          </div>
+          <div class="actionEntrySeperator actionSubCategoryKitchen">
+            <div>Kitchen</div>
+          </div>
+          <div class="actionEntrySeperator actionSubCategoryBed">
+            <div>Bed</div>
+          </div>
+          <div class="clearer"></div>
+        </div>
+       </div>
+       <div class="sliderCtrlSliderContainer">
+        <div class="horizontalSlider"></div>
+       </div>	
+	    </div>
+	    <div class="actions_tabcontent" id="tabs-3">
+       <div class="sliderCtrl">
+        <div class="sliderCtrlContentContainer">
+          <div class="clearer"></div>
+        </div>
+       </div>
+       <div class="sliderCtrlSliderContainer">
+        <div class="horizontalSlider"></div>
+       </div>	   
+	    </div>
+    </div>
+
+    <div class="addCommandSaveBtn"><input type="button" class="addCommandBtn" name="addCommandBtn" value="Save command" /></div>
+  </div>
+</script>	
+
+<script id="uiChillenTmpl" type="text/html">        
+    <div class="uiOverlay uiChillen">
+      <div class="overlayHeader"><h1>Chillen</h1></div>
+      <div class="overlayRow"><a class="" href="javascript:closeOverlay();">Watch TV</a></div>
+      <div class="overlayRow"><a class="" href="javascript:closeOverlay();">Listening Music</a></div>
+      <div class="overlayRow"><a class="" href="javascript:closeOverlay();">Reading</a></div>
+      <div class="overlayRow"><a class="" href="javascript:closeOverlay();">Return to Map</a></div>
+    </div>
+</script>   
+
+<script id="uiKitchenTmpl" type="text/html">        
+    <div class="uiOverlay uiKitchen">
+      <div class="overlayHeader"><h1>Kitchen</h1></div>
+
+      <div class="uiKitchenDevices overlayRow">Kitchen devices</div>
+      <div class="overlayRow">Make Pizza (TODO)</div>
+      <div class="overlayRow">(...)</div>
+      <div class="overlayRow returnToMap">Return to Map</div>   
+    </div>
+</script>   
+
+<script id="uiLivingTmpl" type="text/html">        
+    <div class="uiOverlay uiLiving">
+      <div class="overlayHeader"><h1>Living</h1></div>
+      <div class="uiLivingDevices overlayRow">Livingroom devices</div>
+      <div class="overlayRow returnToMap">Return to Map</div>
+    </div>
+</script>
+
+<script id="uiDevicesTmpl" type="text/html">        
+    <div class="uiOverlay uiLiving">
+      <div class="overlayHeader"><h1>{{ name }}</h1></div>
+      
+      <div class="overlayRow returnToMap">Back</div>
+    </div>
+</script>  
+
+<script id="uiTvTmpl" type="text/html">        
+    <div class="uiOverlay uiTv">
+      <div class="overlayHeader"><h1>TV</h1></div>
+      <div class="overlayRow"><a class="" href="javascript:closeOverlay();">Channels (TODO)</a></div>
+      <div class="overlayRow"><a class="" href="javascript:closeOverlay();">EPG (TODO)</a></div>
+      <div class="overlayRow"><a  href="javascript:closeOverlay();">Recordings (TODO)</a></div>
+      <div class="overlayRow"><a href="javascript:closeOverlay();">Remote Control (TODO)</a></div>
+      <div class="overlayRow returnToMap">Return to Map</div>
+    </div>
+</script>   
+
+<script id="uiLightsTmpl" type="text/html">        
+    <div class="uiOverlay uiLights">
+      <div class="overlayHeader"><h1>Lights</h1></div>
+
+      <div class="uiLightDevices overlayRow">Light Devices</div>
+      <div class="overlayRow">Reading light (TODO)</div>
+      <div class="overlayRow">Max. brightness (TODO)</div>
+      <div class="overlayRow">(...)</div>
+      <div class="overlayRow returnToMap">Return to Map</div>    
+    </div>
+</script>   
+
+<script id="deviceTmpl" type="text/html">        
+    <div class="mapDevice">
+      <img src="{{ icon }}" alt="{{ name }}" class="deviceImg" />
+    </div>
+</script>   
+
+<script id="gestureDialogTmpl" type="text/html">  
+  <div class="gestureDialog" title="Gesture Combination">
+    <div class="gestureDialogRow">
+      <div class="gestureDialogRowTitel">Combination: </div>
+      <div class="gestureDialogRowSelectedValues">
+        
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="gestureDialogRow">
+      <div class="gestureDialogRowTitel">Gestures: </div>
+      <div class="gestureDialogRowAvailableValues">
+        <div class="clearer"></div>
+      </div>
+    </div>
+    <div class="gestureDialogRow">
+      <div class="gestureDialogRowTitel"></div>
+      <div class="gestureDialogRowButton">
+        <input type="button" class="gestureDialogRowButtonBtn" value="Save Combination" />
+      </div>
+      <div class="clearer"></div>
+    </div>    
+    <div class="clearer"></div>
+  </div>
+</script>
+
+<script id="gestureDialogGestureTmpl" type="text/html">  
+  <div class="gestureDialogGesture">
+    <div class="gestureDialogGestureImg gestureDialogGesture{{ name }}"><img src="{{ icon }}" width="22px" height="22px" alt="gestureimg" /></div>
+    <div class="gestureDialogGestureTitel">{{ name }}</div>
+    <div class="clearer"></div>
+  </div>
+</script>
+
+<div id="kinects"></div>
+<div id="regions"></div>
+<div id="users"></div>
+<div id="content"></div>
+<div id="canvascont"></div>
+<div id="bubbles"></div>
+<div id="mapDevices"></div>
+<div id="notification">Draw polygon by clicking vertices on the map. Doubleclick to finish drawing. Path will be closed. ESC to cancel drawing.</div>
+<div id="connectDialog">
+    <div class="sceneSelect" id="reconnectDialog">
+          <h1>Reconnect</h1>          
+          <ul>
+            <li>You have been disconnected from the server. Trying to reconnect... </li>
+            <li><a href="#changeServer" class="changeServer">Change Server</a></li>
+          <ul>
+    </div> 
+    
+    <div class="sceneSelect" id="connDialog">
+          <h1>Connect</h1>
+          <ul>
+            <li>Trying to connect...</li>
+            <li><a href="#changeServer" class="changeServer">Change Server</a></li>
+          <ul>
+    </div>  
+
+    <div class="sceneSelect" id="sceneSelectStep3">
+      <h1>Change server</h1> 
+      <div class="form">    
+        <div class="clear"></div>       
+        <div class="formrow">   
+          <div class="formlabel">serverip</div>  
+          <div class="formvalue"><input type="text" id="loadserverip"  class="text" value="localhost" /></div>  
+        </div>
+        <div class="clear"></div>       
+        <div class="formrow">   
+          <div class="formlabel">port</div>  
+          <div class="formvalue"><input type="text" id="loadport"  class="text" value="8000" /></div>   
+        </div>
+        <div class="clear"></div>      
+        <div class="formrow">   
+          <div class="formlabel"></div>  
+          <div class="formvalue"><input type="button" class="btn2" id="goLoadScene" value="load scene" /></div>    
+        </div>   
+        <div class="clear"></div>           
+      </div>            
+    </div>
+         
+    
+</div>
+
+<div class="dot" id="dot1">1</div>
+<div class="dot" id="dot2">2</div>
+
+</body>
+</html>
